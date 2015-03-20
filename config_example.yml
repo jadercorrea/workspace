@@ -1,0 +1,7 @@
+repos:
+  - user1/repo
+  - user2/repo
+  - user2/repo
+
+github_login: login
+github_password: 'password between single quotes if it has special chars'
