@@ -1,16 +1,15 @@
 require 'twitter'
 
+config = YAML::load_file('config.yml')
 
-#### Get your twitter keys & secrets:
-#### https://dev.twitter.com/docs/auth/tokens-devtwittercom
-twitter = Twitter::REST::Client.new do |config|
-  config.consumer_key = 'YOUR_CONSUMER_KEY'
-  config.consumer_secret = 'YOUR_CONSUMER_SECRET'
-  config.access_token = 'YOUR_OAUTH_TOKEN'
-  config.access_token_secret = 'YOUR_OAUTH_SECRET'
+twitter = Twitter::REST::Client.new do |c|
+  c.consumer_key = config['twitter_consumer_key']
+  c.consumer_secret = config['twitter_consumer_secret']
+  c.access_token = config['twitter_access_token']
+  c.access_token_secret = config['twitter_access_token_secret']
 end
 
-search_term = URI::encode('#todayilearned')
+search_term = URI::encode('#rubyonrails')
 
 SCHEDULER.every '10m', :first_in => 0 do |job|
   begin
