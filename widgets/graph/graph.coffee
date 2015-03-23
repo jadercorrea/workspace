@@ -29,8 +29,10 @@ class Dashing.Graph extends Dashing.Widget
     x_axis = new Rickshaw.Graph.Axis.Time(graph: @graph)
     y_axis = new Rickshaw.Graph.Axis.Y(graph: @graph, tickFormat: Rickshaw.Fixtures.Number.formatKMBT)
     @graph.render()
+    $('.x_tick').remove()
 
   onData: (data) ->
     if @graph
       @graph.series[0].data = data.points
       @graph.render()
+    $('.x_tick').remove()
