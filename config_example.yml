@@ -1,11 +1,14 @@
+github_login: login
+github_password: 'password between single quotes if it has special chars'
 repos:
   - user1/repo
   - user2/repo
   - user2/repo
-
-github_login: login
-github_password: 'password between single quotes if it has special chars'
 twitter_consumer_key: 'your_key'
 twitter_consumer_secret: 'your_secret'
 twitter_access_token: 'your_token'
 twitter_access_token_secret: 'you know what to do'
+semaphore_auth_token: your_auth_token
+projects:
+  - your-app1/master
+  - your-app2/master

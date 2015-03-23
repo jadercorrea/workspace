@@ -10,7 +10,6 @@ Octokit.configure do |c|
   c.password = config["password"]
 end
 
-
 SCHEDULER.every '3m', :first_in => 0 do |job|
   config["repos"].each do |name|
     r = Octokit::Client.new.repository(name)
