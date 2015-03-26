@@ -2,27 +2,36 @@ require 'octokit'
 require 'action_view'
 include ActionView::Helpers::DateHelper
 
-config = YAML::load_file('config.yml')
+def config
+  config = YAML::load_file('config.yml')
 
-Octokit.configure do |c|
-  c.auto_paginate = true
-  c.login = config['github_login']
-  c.password = config['github_password']
+  Octokit.configure do |c|
+    c.auto_paginate = true
+    c.login = config['github_login']
+    c.password = config['github_password']
+  end
+  config["repos"]
+end
+
+def event_send(repo_name)
+    repo = Octokit::Client.new.repository(repo_name)
+    pulls = Octokit.pulls(repo_name, :state => 'open').count
+
+    send_event('github', {
+      repo: repo_name.slice(/([^\/]+)$/),
+      issues: repo.open_issues_count - pulls,
+      pulls: pulls,
+      forks: repo.forks,
+      watchers: repo.subscribers_count,
+      stargazers: repo.stargazers_count,
+      activity: time_ago_in_words(repo.updated_at).capitalize
+    })
 end
 
 SCHEDULER.every '3m', :first_in => 0 do |job|
-  config["repos"].each do |name|
-    r = Octokit::Client.new.repository(name)
-    pulls = Octokit.pulls(name, :state => 'open').count
+  repos = repos || config
 
-    send_event('github', {
-      repo: name.slice(/([^\/]+)$/),
-      issues: r.open_issues_count - pulls,
-      pulls: pulls,
-      forks: r.forks,
-      watchers: r.subscribers_count,
-      stargazers: r.stargazers_count,
-      activity: time_ago_in_words(r.updated_at).capitalize
-    })
+  repos.each do |name|
+    event_send(name)
   end
 end
