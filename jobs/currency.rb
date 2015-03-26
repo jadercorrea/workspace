@@ -24,7 +24,7 @@ def fetch_currency(points)
   points
 end
 
-SCHEDULER.every '10s' do
+SCHEDULER.every '10m' do
   points = points || matrix
   send_event('convergence', points: fetch_currency(points))
 end
