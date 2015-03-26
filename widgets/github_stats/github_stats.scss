@@ -1,21 +1,23 @@
 .widget-github-stats {
   vertical-align: text-top;
-  background-color: #DDDDDD;
+  background-color: #829aa8;
   background-image: url("/assets/GitHub-Mark-Light-120px-plus.png");
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   line-height: 1em;
-}
 
-.title {
-  color: #111111;
-  padding: 10px;
-  font-size: 1.5em;
-  .repo_name {
-    font-weight: bolder;
+  .title {
+    color: #111111;
+    padding: 10px;
+    font-size: 1.5em;
+    .repo_name {
+      font-weight: bolder;
+      text-transform: capitalize;
+    }
   }
 }
+
 .main {
   text-align: left;
   color: #393939;

@@ -8,7 +8,7 @@ class Dashing.Graph extends Dashing.Widget
 
   ready: ->
     container = $(@node).parent()
-    # Gross hacks. Let's fix this.
+
     width = (Dashing.widget_base_dimensions[0] * container.data("sizex")) + Dashing.widget_margins[0] * 2 * (container.data("sizex") - 1)
     height = (Dashing.widget_base_dimensions[1] * container.data("sizey"))
     @graph = new Rickshaw.Graph(
@@ -30,9 +30,11 @@ class Dashing.Graph extends Dashing.Widget
     y_axis = new Rickshaw.Graph.Axis.Y(graph: @graph, tickFormat: Rickshaw.Fixtures.Number.formatKMBT)
     @graph.render()
     $('.x_tick').remove()
+    $(".convergence").removeAttr("style")
 
   onData: (data) ->
     if @graph
       @graph.series[0].data = data.points
       @graph.render()
     $('.x_tick').remove()
+    $(".convergence").removeAttr("style")

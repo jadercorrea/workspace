@@ -6,8 +6,8 @@ config = YAML::load_file('config.yml')
 
 Octokit.configure do |c|
   c.auto_paginate = true
-  c.login = config["login"]
-  c.password = config["password"]
+  c.login = config['login']
+  c.password = config['password']
 end
 
 SCHEDULER.every '3m', :first_in => 0 do |job|

@@ -6,7 +6,7 @@ points = []
 end
 last_index = points.last[:x]
 
-SCHEDULER.every '10s' do
+SCHEDULER.every '10m' do
   points.shift
   last_index += 1
 
