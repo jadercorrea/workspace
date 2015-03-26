@@ -1,21 +1,30 @@
 require 'mechanize'
 
-points = []
-(1..10).each do |i|
-  points << { x: i, y: 0 }
+def matrix
+  points = []
+  (1..10).each do |i|
+    points << { x: i, y: 0 }
+  end
+  points
 end
-last_index = points.last[:x]
 
-SCHEDULER.every '10m' do
+def search(page, element)
+  page.search(element).first[:value].gsub(',', '.')
+end
+
+def fetch_currency(points)
   points.shift
-  last_index += 1
+  last_index  = points.last[:x] + 1
 
   mechanize = Mechanize.new
   mechanize.get('http://dolarhoje.com') do |page|
-    currency = page.search('input#nacional').first[:value].gsub(',', '.')
+    currency = search(page, 'input#nacional')
     points << { x: last_index, y: currency.to_f }
   end
+  points
+end
 
-  send_event('convergence', points: points)
-  send_event('valuation', { current: points.last[:y], last: points.first[:y] })
+SCHEDULER.every '10s' do
+  points = points || matrix
+  send_event('convergence', points: fetch_currency(points))
 end
