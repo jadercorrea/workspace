@@ -11,7 +11,7 @@ def session
   end
 end
 
-def event(tweets)
+def event_send(tweets)
   tweets = tweets.map do |tweet|
     { name: tweet.user.name, body: tweet.text, avatar: tweet.user.profile_image_url_https }
   end
@@ -23,5 +23,5 @@ SCHEDULER.every '10m', :first_in => 0 do |job|
   search_term = URI::encode('#rubyonrails')
   tweets = twitter.search("#{search_term}")
 
-  event(tweets) if tweets
+  event_send(tweets) if tweets
 end
