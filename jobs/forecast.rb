@@ -2,13 +2,16 @@ require 'date'
 require 'net/https'
 require 'json'
 
-config = YAML::load_file('config.yml')
+def url
+  config = YAML::load_file('config.yml')
 
-api_key = config['forecast_api_key']
-latitude = config['forecast_latitude']
-longitude = config['forecast_longitude']
+  api_key = config['forecast_api_key']
+  latitude = config['forecast_latitude']
+  longitude = config['forecast_longitude']
 
-forecast_units = "ca" # like "si", except windSpeed is in kph
+  forecast_units = "ca" # like "si", except windSpeed is in kph
+  "/forecast/#{api_key}/#{latitude},#{longitude}?units=#{forecast_units}"
+end
 
 def time_to_str(time_obj)
   Time.at(time_obj).strftime "%-l %P"
@@ -22,15 +25,18 @@ def day_to_str(time_obj)
   Time.at(time_obj).strftime "%a"
 end
 
-SCHEDULER.every '5m', :first_in => 0 do |job|
+def request
   http = Net::HTTP.new("api.forecast.io", 443)
   http.use_ssl = true
   http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-  response = http.request(Net::HTTP::Get.new("/forecast/#{api_key}/#{latitude},#{longitude}?units=#{forecast_units}"))
-  forecast = JSON.parse(response.body)
+  response = http.request(Net::HTTP::Get.new(url))
+  JSON.parse(response.body)
+end
 
+
+def current(forecast)
   currently = forecast["currently"]
-  current = {
+  {
     temperature: currently["temperature"].round,
     summary: currently["summary"],
     humidity: "#{(currently["humidity"] * 100).round}&#37;",
@@ -38,9 +44,11 @@ SCHEDULER.every '5m', :first_in => 0 do |job|
     wind_bearing: currently["windSpeed"].round == 0 ? 0 : currently["windBearing"],
     icon: currently["icon"]
   }
+end
 
+def today(forecast)
   daily = forecast["daily"]["data"][0]
-  today = {
+  {
     summary: forecast["hourly"]["summary"],
     high: daily["temperatureMax"].round,
     low: daily["temperatureMin"].round,
@@ -48,7 +56,9 @@ SCHEDULER.every '5m', :first_in => 0 do |job|
     sunset: time_to_str_minutes(daily["sunsetTime"]),
     icon: daily["icon"]
   }
+end
 
+def this_week(forecast)
   this_week = []
   for day in (1..7)
     day = forecast["daily"]["data"][day]
@@ -60,6 +70,15 @@ SCHEDULER.every '5m', :first_in => 0 do |job|
     }
     this_week.push(this_day)
   end
+  this_week
+end
+
+
+SCHEDULER.every '5m', :first_in => 0 do |job|
+  forecast = request
+  current = current(forecast)
+  today = today(forecast)
+  this_week = this_week(forecast)
 
   send_event('forecast', {
     current: current,

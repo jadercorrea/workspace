@@ -13,7 +13,7 @@ def config
   config["repos"]
 end
 
-def event_send(repo_name)
+def git_send(repo_name)
     repo = Octokit::Client.new.repository(repo_name)
     pulls = Octokit.pulls(repo_name, :state => 'open').count
 
@@ -32,6 +32,6 @@ SCHEDULER.every '3m', :first_in => 0 do |job|
   repos = repos || config
 
   repos.each do |name|
-    event_send(name)
+    git_send(name)
   end
 end
